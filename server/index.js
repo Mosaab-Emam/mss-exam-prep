@@ -4,6 +4,7 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const mongoose = require("mongoose");
 const router = require("./api");
+const path = require("path");
 
 // Initialize app
 const app = express();
@@ -25,6 +26,14 @@ mongoose.connection.once("open", () => {
 
 // Rest API
 app.use("/api", router);
+
+// Set static directory
+app.use(express.static(path.join(__dirname, "./public")));
+
+// Serve SPA
+app.get("", (req, res) => {
+  res.sendFile(path.join(__dirname, "./public/index.html"));
+});
 
 // Start server
 app.listen(process.env.PORT, () => {
