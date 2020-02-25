@@ -2,11 +2,46 @@ const express = require("express");
 const router = express.Router();
 const Question = require("./model");
 
-router.get("/:discipline/:lesson", (req, res) => {
-  const { discipline, lesson } = req.params;
-  Question.find({ discipline, lesson }).then(data => {
-    res.send(data);
+router.get("/:discipline", async (req, res) => {
+  const { discipline } = req.params;
+
+  // Get all questions under the passed discipline
+  const questionsUnderDiscipline = await Question.find({ discipline });
+
+  // Get unique topics under the passed discipline
+  const topicsUnderDiscipline = new Set();
+  questionsUnderDiscipline.forEach(q => {
+    topicsUnderDiscipline.add(q.broadSection);
   });
+
+  // Get practices under each topic
+  const practicesUnderTopic = {};
+  questionsUnderDiscipline.forEach(q => {
+    if (!practicesUnderTopic[q.broadSection]) {
+      practicesUnderTopic[q.broadSection] = [];
+    } else {
+      if (!practicesUnderTopic[q.broadSection].includes(q.practice)) {
+        practicesUnderTopic[q.broadSection].push(q.practice);
+      }
+    }
+  });
+
+  const practices = [];
+  [...topicsUnderDiscipline].forEach(t => {
+    practicesUnderTopic[t].forEach(p => {
+      const questions = questionsUnderDiscipline.filter(q => {
+        return q.broadSection == t && q.practice === p;
+      });
+      practices.push({
+        topic: t,
+        title: p,
+        numberOfQuestions: questions.length
+      });
+    });
+  });
+
+  // Send data object
+  res.send(practices);
 });
 
 router.post("", (req, res) => {

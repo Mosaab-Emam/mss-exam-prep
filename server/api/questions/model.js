@@ -16,6 +16,14 @@ const QuestionSchema = new mongoose.Schema({
   lesson: {
     type: String,
     required: true
+  },
+  broadSection: {
+    type: String,
+    required: true
+  },
+  practice: {
+    type: String,
+    required: true
   }
 });
 
