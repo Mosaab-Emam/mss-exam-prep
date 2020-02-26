@@ -35,7 +35,7 @@ router.get("/:discipline", async (req, res) => {
       practices.push({
         topic: t,
         title: p,
-        numberOfQuestions: questions.length
+        questions
       });
     });
   });
